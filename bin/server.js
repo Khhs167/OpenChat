@@ -98,7 +98,7 @@ website.get("/*", (req, res) => {
     }
 });
 
-var website_srv = website.listen('8080', '0.0.0.0', () => {
+var website_srv = website.listen('80', '0.0.0.0', () => {
     var host = website_srv.address().address
     var port = website_srv.address().port
     
