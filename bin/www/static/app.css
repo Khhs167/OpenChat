@@ -1,0 +1,63 @@
+.data {
+
+    width: 30vw;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    padding: 5;
+}
+
+.connection {
+
+    margin-top: 10px;
+
+    width: 30vw;
+    height: 10vh;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    padding: 5;
+}
+
+.connection button {
+    width: 49%;
+    height: 100%;
+}
+
+.data button {
+    width: 20%
+}
+
+.data label {
+
+    display: inline-block;
+
+    width: 35%;
+}
+
+.data input {
+    width: 35%;
+}
+
+.messages {
+
+    margin-top: 10px;
+
+    border-width: 1px;
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    padding: 5;
+
+    background-color: #222;
+
+    min-height: 30vh;
+
+    color: white;
+}
+
+.chatbox {
+
+}

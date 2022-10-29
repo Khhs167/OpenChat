@@ -1,0 +1,19 @@
+{
+  "name": "openchat",
+  "version": "1.0.0",
+  "description": "A secure chat application for p2p communication",
+  "author": "khhs",
+  "license": "MIT",
+  "main": "./bin/server.js",
+  "bin": {
+    "openchat": "./bin/server.js"
+  },
+  "dependencies": {
+    "boxen": "4.0",
+    "chalk": "2.4",
+    "express": "^4.18.2",
+    "prompt-sync": "^4.2.0",
+    "ws": "^8.10.0",
+    "yargs": "13.2"
+  }
+}

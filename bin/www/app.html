@@ -1,0 +1,137 @@
+<html>
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"
+    integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="static/app.css" />
+  <title>OpenChat - web</title>
+</head>
+
+<body>
+  <h1>OpenChat</h1>
+  <div class="data">
+    <label>Server:</label>
+    <input id="server" placeholder="Server" value="localhost">
+    <hr>
+    <label>Port:</label>
+    <input id="port" placeholder="Port" value="25569">
+    <hr>
+    <label>Key:</label>
+    <input id="key" placeholder="Key">
+    <button onclick="randomizeKey()">randomize</button>
+    <hr>
+    <label>Room:</label>
+    <input id="room" placeholder="Room">
+    <button onclick="randomizeRoom()">randomize</button>
+  </div>
+  <div class="connection">
+    <button id="connect">Connect</button>
+    <button id="close" disabled="true">Disconnect</button>
+  </div>
+  <br>
+  <br>
+  <div class="chatbox">
+    <input id="username" placeholder="Username">
+    <input id="message" placeholder="Message">
+    <button id="send" disabled="true">Send</button>
+  </div>
+  <div id="messages" class="messages">
+    <div style="color: red">[no connection]</div>
+  </div>
+  <p>
+    Info/Help:
+    <br>
+    - If messages you or your friend send don't show, ensure you have the same keys
+    <br>
+    - All messages sent are encrypted and edited. 
+  </p>
+</body>
+
+
+<script type="text/javascript" >
+  function generateGuid() {
+    return Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+  }
+
+  function randomizeKey() {
+    document.getElementById("key").value = generateGuid();
+  }
+
+  function randomizeRoom() {
+    document.getElementById("room").value = generateGuid();
+  }
+
+  document.getElementById("connect").onclick = () => {
+
+    if(!confirm("Please be aware someone who knows your key can see each your messages!\n\nThe code will automatically hide messages that don't decrypt with a special header. This can be disabled by downloading source and/or editing the page source in the script tag, which allows brue-forcing!\n\nThis means that anyone who is in the same room as you and has the same key, a key that encrypts with the same results or who has edited the source, can possibly read all messages you send!\n\nBy pressing OK you understand that we do not guarantee privacy, and that you understand this information."))
+      return;
+
+    document.querySelector('#username').value = "user_" + generateGuid();
+
+
+    const ws = new WebSocket('ws://' + document.getElementById("server").value + ':' + document.getElementById("port").value);
+
+    ws.onopen = function() {
+
+      document.querySelector('#messages').innerHTML = "";
+
+      document.querySelector('#send').disabled = false;
+
+      document.querySelector('#send').addEventListener('click', function() {
+
+        var msg = document.querySelector('#message').value;
+
+        msg = "_o_[" + document.querySelector('#username').value + "] " + msg;
+        
+        var encrypted = CryptoJS.AES.encrypt(msg,  document.querySelector('#key').value);
+
+
+        ws.send("_e_" + encrypted);
+      });
+
+      ws.send(document.getElementById("room").value);
+
+      document.getElementById("close").disabled = false;
+      document.getElementById("connect").disabled = true;
+
+      document.getElementById("close").onclick = () => {
+        ws.close();
+      }
+
+    };
+
+    ws.onmessage = function(msg) {
+
+      var message = msg.data.toString();
+
+      console.log(message)
+
+      if(message.startsWith("_g_"))
+        message = '<div style="color: green;">' + msg.data.substring(3) + "</div>";
+      else if(message.startsWith("_e_")){
+        message = msg.data.substring(3);
+        var decrypted = CryptoJS.AES.decrypt(message, document.querySelector('#key').value);
+        message = decrypted.toString(CryptoJS.enc.Utf8)
+
+        if(message.startsWith("_o_")){
+          message = message.substring(3);
+        } else {
+          message = "";
+        }
+
+      }
+
+      document.querySelector('#messages').innerHTML += `<div>${message}</div>`;
+    };
+
+    ws.onclose = () => {
+      document.querySelector("#messages").innerHTML = '<div style="color: red">[no connection]</div>';
+      document.getElementById("close").disabled = true;
+      document.getElementById("connect").disabled = false;
+      document.querySelector('#send').disabled = true;
+    }
+  }
+</script>
+
+</html>
